@@ -17,7 +17,7 @@ Inductive DistinctPoints : Type :=
   distinctPoints (p1 p2 : Point) : p1 <> p2 -> DistinctPoints.
 
 Definition extremities : Line -> DistinctPoints. Admitted.
-Definition intersection : Line -> Line -> option Point. Admitted.
+Definition intersection : Line -> Line -> Point -> Prop. Admitted.
 (** 
 -4. A [StraightLine] is that which evenly between its extreme points. Any portion cut off from a straight line is called a segment of it.
 *)
@@ -51,3 +51,17 @@ Definition planeProp (s : Surface) : Prop :=
 Inductive Plane : Type :=
   plane (s : Surface) : planeProp s -> Plane.
 
+(**
+-8. A plane angle is the inclination of two [Line]s to each other which meet together, but are not in the same direction.
+(Definition 8. is not required in Euclid's geometry the only angles employed by him being those formed by [StraightLine]s.
+*)
+
+(**
+-9. A plane rectilinear angle is the inclination of two [StraightLine]s to one another, which meet together, but are not in the same [StraightLine].
+The [Point] at which the [StraightLine] meet is called the [Vertex] of the angle, and the [StraightLine]s themselves the [Arm]s of the angle. 
+*)
+Definition notColinear (l1 l2 : StraightLine) : Prop :=
+  forall (l : StraightLine), ~(segmentOf l1 l) \/ ~(segmentOf l2 l).
+
+Inductive Angle (l1 l2 : StraightLine) (p : Point) : Type :=
+  angle : notColinear l1 l2 -> intersection (line l1) (line l2) p -> Angle l1 l2 p.
