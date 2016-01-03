@@ -26,6 +26,7 @@ Definition Point : Type. Admitted.
 -2. A [Line] is that which has length without breadth 
 *)
 Definition Line : Type. Admitted.
+Definition length : Line -> Magnitude. Admitted.
 (**
 -3. The [extremities] of a [Line] are [Point]s, and the [intersection] of two [Line]s is a [Point]. 
 *)
@@ -90,17 +91,26 @@ But if there is only one [Angle] at a [Point], it may be expressed by a single l
 Of the two [StraightLine]s OB, OC shewn in the adjoining diagram, we recognize that OC is more inclined than OB to the [StraightLine] OA : this we express by saying that the [Angle] AOC is greater thn the angle AOB.
 Thus the [Angle] must be regarded as having a [Magnitude].
 *)
-Definition angleMagnitude (l1 l2 : StraightLine) (p : Point) : Angle l1 p l2 -> Magnitude. Admitted.
+Definition angleMagnitude (l1 l2 : StraightLine) (p : Point) : 
+           Angle l1 p l2 -> Magnitude. 
+Admitted.
 
 (**
 It must be carefully observed that the size of an angle in no way depends on the length of its arms, but only on their inclination to one another.
 The angle AOC is the sum of the angles AOB and BOC; and AOB is the difference of the angles AOC and BOC.
 *)
 
-Definition angleSum (l1 l2 l3 : StraightLine) (p : Point) : Angle l1 p l2 -> Angle l2 p l3 -> Angle l1 p l3 -> Prop. Admitted.
-Definition angleDiff (l1 l2 l3 : StraightLine) (p : Point) : Angle l1 p l2 -> Angle l1 p l3 -> Angle l2 p l3 -> Prop. Admitted.
+Definition angleSum (l1 l2 l3 : StraightLine) (p : Point) : 
+           Angle l1 p l2 -> Angle l2 p l3 -> Angle l1 p l3 -> Prop. 
+Admitted.
+Definition angleDiff (l1 l2 l3 : StraightLine) (p : Point) : 
+           Angle l1 p l2 -> Angle l1 p l3 -> Angle l2 p l3 -> Prop. 
+Admitted.
 
-Definition angleGreaterEqual (l1 l2 l3 : StraightLine) (p : Point) : Angle l1 p l2 -> Angle l2 p l3 -> Prop. Admitted.
+Definition angleGreaterEqual (l1 l2 l3 : StraightLine) (p : Point) : 
+           Angle l1 p l2 -> Angle l2 p l3 -> Prop. 
+Admitted.
+
 Notation "x <= y" := (angleGreaterEqual x y)  
                        (at level 70, no associativity) 
                        : angle_scope.
