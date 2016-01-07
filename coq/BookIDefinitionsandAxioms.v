@@ -26,22 +26,35 @@ Definition Point : Type. Admitted.
 -2. A [Line] is that which has length without breadth 
 *)
 Definition Line : Type. Admitted.
-Definition length : Line -> Magnitude. Admitted.
+
+Definition lineLength : Line -> Magnitude. Admitted.
 (**
 -3. The [extremities] of a [Line] are [Point]s, and the [intersection] of two [Line]s is a [Point]. 
 *)
-Inductive DistinctPoints : Type :=
-  distinctPoints (p1 p2 : Point) : p1 <> p2 -> DistinctPoints.
 
-Definition extremities : Line -> DistinctPoints. Admitted.
+Definition extremals : Line -> Point * Point. Admitted.
+
 Definition intersection : Line -> Line -> Point -> Prop. Admitted.
+
 (** 
 -4. A [StraightLine] is that which evenly between its extreme points. Any portion cut off from a straight line is called a segment of it.
 *)
-Definition StraightLine : Type. Admitted.
-Definition line : StraightLine -> Line. Admitted.
+Definition straightLine (l : Line) : Prop. Admitted.
 
-Definition lineBetweenExtreme : DistinctPoints -> StraightLine. Admitted.
+(* Set of helper types for a pair of line and proof of straightness *)
+Inductive StraightLine : Type :=
+  straightLineCons (l : Line) : straightLine l -> StraightLine.
+Definition line (s : StraightLine) : Line :=
+  match s with
+    | straightLineCons l _ => l
+  end.
+
+Definition straightLineDeterminedByExtremals (p1 p2 q1 q2 : Point) 
+                                 (l1 l2 : Line) : 
+    straightLine l1 -> straightLine l2 -> 
+    extremals l1 = (p1,p2) -> extremals l2 = (q1,q2) ->
+                              (p1 = q1) -> (p2 = q2) -> l1 = l2.
+Admitted.
 
 Definition segmentOf : StraightLine -> StraightLine -> Prop. Admitted.
 (**
@@ -60,13 +73,15 @@ Definition surfaceBoundary : Surface -> list Line. Admitted.
 Definition pointOnSurface : Point -> Surface -> Prop. Admitted.
 Definition lineOnSurface : Line -> Surface -> Prop. Admitted.
 
-Definition planeProp (s : Surface) : Prop :=
-  forall (p1 p2 : Point) (dist : p1 <> p2)
-         (_ : pointOnSurface p1 s) (_ : pointOnSurface p2 s),
-    lineOnSurface (line (lineBetweenExtreme (distinctPoints p1 p2 dist))) s.
+Definition planeSurface (s : Surface) : Prop :=
+  forall (p1 p2 : Point) (l : Line),
+    pointOnSurface p1 s -> pointOnSurface p2 s ->
+    (p1 , p2) = extremals l -> straightLine l ->
+    lineOnSurface l s.
 
-Inductive Plane : Type :=
-  plane (s : Surface) : planeProp s -> Plane.
+(* Helper type for a pair of a surface and a proof that it is a plane *)
+Inductive PlaneSurface : Type :=
+  plane (s : Surface) : planeSurface s -> PlaneSurface.
 
 (**
 -8. A plane angle is the inclination of two [Line]s to each other which meet together, but are not in the same direction.
@@ -114,6 +129,8 @@ Admitted.
 Notation "x <= y" := (angleGreaterEqual x y)  
                        (at level 70, no associativity) 
                        : angle_scope.
+
+
 
 (** Note in book type later *)
 
