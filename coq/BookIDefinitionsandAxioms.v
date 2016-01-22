@@ -9,15 +9,19 @@ We make a few pre-emptive definitions about the notion of a magnitude which is a
 With the natural notations *)
 Definition Magnitude : Type. Admitted.
 
+Close Scope nat_scope.
+
 Definition add : Magnitude -> Magnitude -> Magnitude. Admitted.
 Definition greaterEqual : Magnitude -> Magnitude -> Prop. Admitted.
 
 Notation "x + y" := (add x y)  
                        (at level 50, left associativity) 
-                       : magnitude_scope.
+                       : Magnitude_scope.
 Notation "x <= y" := (greaterEqual x y)  
                        (at level 70, no associativity) 
-                       : magnitude_scope.
+                       : Magnitude_scope.
+Bind Scope Magnitude_scope with Magnitude.
+Open Scope Magnitude_scope.
 (**
 -1. A [Point] is that which has position, but no [Magnitude]
 *) 
@@ -141,13 +145,24 @@ Definition angleSum (a1 a2 asum : Angle) : Prop :=
                                      /\ colinear l2 l5
   end.
 
-(* Add comment as to the formation of this definition *)
+(* Implicit assertation that the sum of angles goes to the sum of magnitudes *)
+Definition angleSumToMagSum (a1 a2 asum : Angle) :
+  angleSum a1 a2 asum -> 
+       (angleMagnitude a1 + angleMagnitude a2) = angleMagnitude asum.
+Admitted.
+
+(* Helper defintions for when [Angle]s are equal in magnitude *)
+Defintion equalAngleMagnitude (a1 a2 : Angle) : Prop :=
+  angleMagnitude a1 = angleMagnitude a2.
+
 Definition angleGreaterEqual (a1 a2 : Angle) : Prop :=
   ex (fun adiff => angleSum a1 adiff a2). 
 
-Notation "x <= y" := (angleGreaterEqual x y)  
-                       (at level 70, no associativity) 
-                       : angle_scope.
+(* Helper defintions for when [Angle]s are greater than or equal in magnitude *)
+Defintion greaterEqualAngleMagnitude (a1 a2 : Angle) : Prop :=
+  angleMagnitude a1 <= angleMagnitude a2.
+
+
 
 
 
