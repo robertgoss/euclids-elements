@@ -97,12 +97,14 @@ Inductive PlaneSurface : Type :=
 -9. A plane rectilinear angle is the inclination of two [StraightLine]s to one another, which meet together, but are not in the same [StraightLine].
 The [Point] at which the [StraightLine] meet is called the [vertex] of the angle, and the [StraightLine]s themselves the [arms] of the [Angle]. 
 *)
-Definition notColinear (l1 l2 : StraightLine) : Prop :=
-  forall (l : StraightLine), ~(segmentOf l1 l) \/ ~(segmentOf l2 l).
+
+
+Definition colinear (l1 l2 : StraightLine) : Prop :=
+  exists (l : StraightLine), (segmentOf l1 l) /\ (segmentOf l2 l).
 
 Inductive Angle : Type :=
   angle (l1 l2 : StraightLine) (p : Point) : 
-       notColinear l1 l2 -> isExtremal (line l1) p -> isExtremal (line l2) p -> Angle.
+       not (colinear l1 l2) -> isExtremal (line l1) p -> isExtremal (line l2) p -> Angle.
 
 Definition vertex (a : Angle) : Point :=
   match a with
@@ -129,16 +131,19 @@ It must be carefully observed that the size of an angle in no way depends on the
 The angle AOC is the sum of the angles AOB and BOC; and AOB is the difference of the angles AOC and BOC.
 *)
 
-Definition angleSum (a1 a2 asum : Angle) (l1 l2 l3 : StraightLine) (p : Point) : 
-           p = vertex a1 -> p = vertex a2 -> p = vertex asum ->
-           (l1,l2) = arms a1 -> (l2,l3) = arms a2 -> (l1,l3) = arms asum ->
-           Prop.
-Admitted.
+(* Add comment as to the formation of this definition *)
+Definition angleSum (a1 a2 asum : Angle) : Prop :=
+  match (arms a1, arms a2,arms asum) with
+    | ((l1,l2), (l3,l4), (l5,l6)) => vertex a1 = vertex a2
+                                     /\ vertex a1 = vertex asum
+                                     /\ colinear l2 l3
+                                     /\ colinear l1 l4
+                                     /\ colinear l2 l5
+  end.
 
-Definition angleGreaterEqual (a1 a2 : Angle) (l1 l2 l3 : StraightLine) (p : Point) : 
-           p = vertex a1 -> p = vertex a2 -> 
-           (l1,l2) = arms a1 -> (l2,l3) = arms a2 -> Prop. 
-Admitted.
+(* Add comment as to the formation of this definition *)
+Definition angleGreaterEqual (a1 a2 : Angle) : Prop :=
+  ex (fun adiff => angleSum a1 adiff a2). 
 
 Notation "x <= y" := (angleGreaterEqual x y)  
                        (at level 70, no associativity) 
@@ -155,5 +160,4 @@ For example, when one [StraightLine] OC is drawn from a [Point] in another [Stra
 When two [StraightLine]s, such as AB, CD, cross one another at E the two [Angle]s CEA, BED are said to be vertically opposite.
 The two [Angle]s CEB, AED are also vertically opposite to one another.
 *)
-
 
