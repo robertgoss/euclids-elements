@@ -151,13 +151,31 @@ Notation "x <= y" := (angleGreaterEqual x y)
 
 
 
-(** Note in book type later *)
+(** ( Another view of an [Angle] is recognized in many branches of mathematics; and though not employed by Euclid, it is here given because it furnishes more clearly than any other a conception of what is meant by the [Magnitude] of an [Angle].
+Suppose that the [StraightLine] OP in the diagram is capable of revolution about the [Point] O like the hands of a watch, but in the opposite direction; and suppose that in this way it has passed successively from the positions OA to the positions occupied by OB and OC. Such a [Line] must have undergone more turning in passing from OA to OC than in passing from OA to OB; and consequently the [Angle] AOC is said to be greater than the [Angle] AOB. )  *)
 
 (** 
 [Angle]s which lie on either side of a common arm are called [adjacent] angles.
 For example, when one [StraightLine] OC is drawn from a [Point] in another [StraightLine] AB, the angles COA, COB are adjacent.
+*)
 
+Definition adjancent (a1 a2 : Angle) : Prop :=
+  ex (fun asum => angleSum a1 a2 asum).
+ 
+(**
 When two [StraightLine]s, such as AB, CD, cross one another at E the two [Angle]s CEA, BED are said to be vertically opposite.
 The two [Angle]s CEB, AED are also vertically opposite to one another.
 *)
 
+(* Define a helper method wherre we make explicit the lines we assue exist*)
+Definition verticallyOppositeLines' (a1 a2 : Angle) (lA lB : StraightLine) : Prop :=
+  match (arms a1, arms a2) with
+    | ((l1,l2),(l3,l4)) => vertex a1 = vertex a2
+                        /\ segmentOf l1 lA
+                        /\ segmentOf l2 lB
+                        /\ segmentOf l3 lA
+                        /\ segmentOf l4 lB
+  end.
+
+Definition verticallyOpposite (a1 a2 : Angle) : Prop :=
+  ex (fun lA => ex (fun lB => verticallyOppositeLines' a1 a2 lA lB)).
