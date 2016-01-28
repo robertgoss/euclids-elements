@@ -4,24 +4,42 @@ Module Euclid.
 
 (** ** Definitions *)
 
-(** **** Coq note  
-We make a few pre-emptive definitions about the notion of a magnitude which is a quantity with a notion of size comparison and addition. 
-With the natural notations *)
-Definition Magnitude : Type. Admitted.
-
+(* We close the nat scope as we will want to use the addition operator for magnitudes. *)
 Close Scope nat_scope.
 
-Definition add : Magnitude -> Magnitude -> Magnitude. Admitted.
-Definition greaterEqual : Magnitude -> Magnitude -> Prop. Admitted.
+(**** Coq Note
+We move the notition of a magnitude to the start of this note.
 
-Notation "x + y" := (add x y)  
-                       (at level 50, left associativity) 
-                       : Magnitude_scope.
-Notation "x <= y" := (greaterEqual x y)  
-                       (at level 70, no associativity) 
-                       : Magnitude_scope.
-Bind Scope Magnitude_scope with Magnitude.
-Open Scope Magnitude_scope.
+A magnitude appears in the form of length and angle. It should be thought of as a positive unit with equality , comparison and summation relations but no units of measurement.*)
+
+(** General Axioms
+-1. Things which are equal to the same thing are equal to one another.
+-2. If equals be added to equals, the wholes are equal.
+-3. If equals be taken from equals the remainders are equal.
+-4. If equals be added to unequals, the whole are unequal, the greater sum being that which includes the greater of the unequals.
+-5. If equals be taken from unequals, the remainders are unequal, the greater remainder being that which is left from the greater of the unequals.
+-6. Things which are doubles of the same thing, or of equal things, are equal to each other.
+-7. Things which are halves of the same thing, or of equal things, are equal to each other.
+The eighth axiom is geometric in nature and has thus been placed later
+-9. The whole is greater than it's parts.
+*)
+
+Class Magnitude {M : Type} (add : M -> M -> M) (greaterThan : M -> M -> Prop): Type := {
+  general_axiom_1 : forall x y z : M, x=y -> x=z -> y=z;
+  general_axiom_2 : forall x1 x2 y1 y2 : M, x1=x2 -> y1=y2 -> (add x1 y1)=(add x2 y2);
+  general_axiom_3 : forall x1 x2 y1 y2 : M, x1=x2 -> (add x1 y1)=(add x2 y2) -> y1=y2;
+  general_axiom_4 : forall x1 x2 y1 y2 : M, x1=x2 -> y1<>y2 -> (add x1 y1)<>(add x2 y2);
+  general_axiom_4_1 : forall x1 x2 y1 y2 : M, x1=x2 -> greaterThan y1 y2 -> greaterThan (add x1 y1) (add x2 y2);
+  general_axiom_4_2 : forall x1 x2 y1 y2 : M, x1=x2 -> greaterThan y2 y1 -> greaterThan (add x2 y2) (add x1 y1);
+  general_axiom_5 : forall x1 x2 y1 y2 : M, x1=x2 -> (add x1 y1)<>(add x2 y2) -> y1<>y2;
+  general_axiom_5_1 : forall x1 x2 y1 y2 : M, x1=x2 -> greaterThan (add x1 y1) (add x2 y2) -> greaterThan y1 y2;
+  general_axiom_5_2 : forall x1 x2 y1 y2 : M, x1=x2 -> greaterThan (add x2 y2) (add x1 y1) -> greaterThan y2 y1;
+  general_axiom_6 : forall x y : M, x = y -> (add x x)=(add y y);
+  general_axiom_7 : forall x y : M, (add x x)=(add y y) -> x=y;
+  general_axiom_9 : forall x y : M, greaterThan (add x y) x;
+}.
+
+
 (**
 -1. A [Point] is that which has position, but no [Magnitude]
 *) 
@@ -152,14 +170,14 @@ Definition angleSumToMagSum (a1 a2 asum : Angle) :
 Admitted.
 
 (* Helper defintions for when [Angle]s are equal in magnitude *)
-Defintion equalAngleMagnitude (a1 a2 : Angle) : Prop :=
+Definition equalAngleMagnitude (a1 a2 : Angle) : Prop :=
   angleMagnitude a1 = angleMagnitude a2.
 
 Definition angleGreaterEqual (a1 a2 : Angle) : Prop :=
   ex (fun adiff => angleSum a1 adiff a2). 
 
 (* Helper defintions for when [Angle]s are greater than or equal in magnitude *)
-Defintion greaterEqualAngleMagnitude (a1 a2 : Angle) : Prop :=
+Definition greaterEqualAngleMagnitude (a1 a2 : Angle) : Prop :=
   angleMagnitude a1 <= angleMagnitude a2.
 
 
@@ -194,3 +212,19 @@ Definition verticallyOppositeLines' (a1 a2 : Angle) (lA lB : StraightLine) : Pro
 
 Definition verticallyOpposite (a1 a2 : Angle) : Prop :=
   ex (fun lA => ex (fun lB => verticallyOppositeLines' a1 a2 lA lB)).
+
+(**
+-10. When a [StraightLine] standing on another makes the [adjancent] [Angle]s equal to one another, each of the [Angle]s is called a [rightAngle]; and the [StraightLine] which stands on the other is called [perpendicular] to it.
+*)
+
+(* Define helper method which add extra lines which are assumed to exist *)
+Definition perpendicularDiagram (lBase lStanding : StraightLine) (pMeeting : Point) : Prop :=
+  intersection lBase lStanding pMeeting
+  /\ isExtremal lStanding pMeeting
+  /\ not (isExtremal lBase pMeeting) 
+  /\ not (colinear lBase lStanding)
+  
+(* To pove we can form an angle need to prove that 
+
+Definition rightAngle (a : Angle) : Prop :=
+  ex (
